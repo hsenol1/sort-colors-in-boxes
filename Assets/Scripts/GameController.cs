@@ -1,20 +1,58 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class GameController : Singleton<GameController>
 {
-    public BottleController FirstBottle;
-    public BottleController SecondBottle;
-    public BottleController[] bottles;
+    public List<BottleController> bottles = new List<BottleController>();
+    private BottleController FirstBottle;
+    private BottleController SecondBottle;
 
-
-    // Start is called before the first frame update
     void Start()
     {
-        bottles = new BottleController[2];
+        // Find all BottleController objects in the scene and add them to the list
+        BottleController[] foundBottles = FindObjectsOfType<BottleController>();
+        bottles.AddRange(foundBottles);
+
+        // Ensure each bottle has a BoxCollider2D
+        foreach (BottleController bottle in bottles)
+        {
+            if (bottle.GetComponent<BoxCollider2D>() == null)
+            {
+                bottle.gameObject.AddComponent<BoxCollider2D>();
+            }
+        }
     }
 
+    // public void OnBottleClicked(BottleController clickedBottle)
+    // {
+    //     if (FirstBottle == null)
+    //     {
+    //         FirstBottle = clickedBottle;
+    //     }
+    //     else if (clickedBottle == FirstBottle)
+    //     {
+    //         // Deselect if clicking the same bottle
+    //         FirstBottle = null;
+    //     }
+    //     else
+    //     {
+    //         SecondBottle = clickedBottle;
+    //         FirstBottle.bottleRef = SecondBottle;
+
+    //         FirstBottle.UpdateTopColorValues();
+    //         SecondBottle.UpdateTopColorValues();
+
+    //         if (SecondBottle.FillBottleCheck(FirstBottle.topColor))
+    //         {
+    //             FirstBottle.StartColorTransfer();
+    //         }
+
+    //         // Reset selections after attempting transfer
+    //         FirstBottle = null;
+    //         SecondBottle = null;
+    //     }
+    // }
+}
     // // Update is called once per frame
     // void Update()
     // {
@@ -34,7 +72,7 @@ public class GameController : Singleton<GameController>
     //                 }
     //                 else
     //                 {
-    //                     if (FirstBottle == hit.collider.GetComponent<BottleController>())
+    //                     if (FirstBottle = hit.collider.GetComponent<BottleController>())
     //                     {
     //                         FirstBottle = null;
     //                     }
@@ -64,26 +102,3 @@ public class GameController : Singleton<GameController>
     //         }
     //     }
     // }
-
-
-
-    public void OnBottleClicked(BottleController clickedBottle)
-    {
-        if (FirstBottle == null)
-            FirstBottle = clickedBottle;
-        else if (clickedBottle == FirstBottle)
-            FirstBottle = null;
-        else
-        {
-            SecondBottle = clickedBottle;
-            FirstBottle.bottleRef = SecondBottle;
-            FirstBottle.UpdateTopColorValues();
-            SecondBottle.UpdateTopColorValues();
-
-            if (SecondBottle.FillBottleCheck(FirstBottle.topColor))
-                FirstBottle.StartColorTransfer();
-            
-            FirstBottle = null; SecondBottle = null;
-        }
-    }
-}
