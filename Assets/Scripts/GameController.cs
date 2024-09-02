@@ -6,100 +6,73 @@ public class GameController : Singleton<GameController>
     public List<BottleController> bottles = new List<BottleController>();
     private BottleController FirstBottle;
     private BottleController SecondBottle;
+    // private Level level;
+    private Vector3 startPosition = new Vector3(0,0,0);
+    private float spacing = 1f;
+
+    public BottleController bottlePrefab;
+    private int numberOfBottles;
+    private List<BottleController> gameBottles;
+
 
     void Start()
     {
-        // // Find all BottleController objects in the scene and add them to the list
-        // BottleController[] foundBottles = FindObjectsOfType<BottleController>();
-        // bottles.AddRange(foundBottles);
-
-        // // Ensure each bottle has a BoxCollider2D
-        // foreach (BottleController bottle in bottles)
-        // {
-        //     if (bottle.GetComponent<BoxCollider2D>() == null)
-        //     {
-        //         bottle.gameObject.AddComponent<BoxCollider2D>();
-        //     }
-        // }
+        numberOfBottles = 4;
+        InstantiateBottles();
+        gameBottles = new List<BottleController>();
     }
 
-    // public void OnBottleClicked(BottleController clickedBottle)
-    // {
-    //     if (FirstBottle == null)
-    //     {
-    //         FirstBottle = clickedBottle;
-    //     }
-    //     else if (clickedBottle == FirstBottle)
-    //     {
-    //         // Deselect if clicking the same bottle
-    //         FirstBottle = null;
-    //     }
-    //     else
-    //     {
-    //         SecondBottle = clickedBottle;
-    //         FirstBottle.bottleRef = SecondBottle;
 
-    //         FirstBottle.UpdateTopColorValues();
-    //         SecondBottle.UpdateTopColorValues();
-
-    //         if (SecondBottle.FillBottleCheck(FirstBottle.topColor))
-    //         {
-    //             FirstBottle.StartColorTransfer();
-    //         }
-
-    //         // Reset selections after attempting transfer
-    //         FirstBottle = null;
-    //         SecondBottle = null;
-    //     }
-    // }
-
-    // Update is called once per frame
-    void Update()
+    private void InstantiateBottles()
     {
-        if (Input.GetMouseButtonDown(0))
+        for (int i = 0; i < numberOfBottles; i++)
         {
-            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector2 mousePos2D = new Vector2(mousePos.x, mousePos.y);
-            RaycastHit2D hit = Physics2D.Raycast(mousePos2D, Vector2.zero);
-
-            if (hit.collider != null)
-            {
-                if (hit.collider.GetComponent<BottleController>() != null)
-                {
-                    if (FirstBottle == null)
-                    {
-                        FirstBottle = hit.collider.GetComponent<BottleController>();
-                    }
-                    else
-                    {
-                        if (FirstBottle == hit.collider.GetComponent<BottleController>())
-                        {
-                            FirstBottle = null;
-                        }
-                        else
-                        {
-                            SecondBottle = hit.collider.GetComponent<BottleController>();
-                            FirstBottle.bottleRef = SecondBottle;
-
-                            FirstBottle.UpdateTopColorValues();
-                            SecondBottle.UpdateTopColorValues();
-
-                            if (SecondBottle.FillBottleCheck(FirstBottle.topColor) == true)
-                            {
-                                FirstBottle.StartColorTransfer();
-                                FirstBottle = null;
-                                SecondBottle = null;
-                            }
-                            else
-                            {
-                                FirstBottle = null;
-                                SecondBottle = null;
-                            }
-                        }
-                    }
-        
-                }
-            }
+            Vector3 position = startPosition + i * new Vector3(spacing,0,0);
+            BottleController newBottle = Instantiate(bottlePrefab,position, Quaternion.identity);
+            newBottle.transform.SetParent(this.transform);
+            bottles.Add(newBottle);
         }
+    }
+    public void HandleBottleClicked(BottleController clickedBottle)
+    {
+        if (FirstBottle == null)
+        {
+            FirstBottle = clickedBottle;
+        }
+        else if (clickedBottle == FirstBottle)
+        {
+            // Deselect if clicking the same bottle
+            FirstBottle = null;
+        }
+        else
+        {
+            SecondBottle = clickedBottle;
+            FirstBottle.bottleRef = SecondBottle;
+
+            FirstBottle.UpdateTopColorValues();
+            SecondBottle.UpdateTopColorValues();
+
+            if (SecondBottle.FillBottleCheck(FirstBottle.topColor))
+            {
+                FirstBottle.StartColorTransfer();
+            }
+
+            // Reset selections after attempting transfer
+            FirstBottle = null;
+            SecondBottle = null;
+        }
+    }
+
+
+
+
+    private bool CheckIfLevelIsCompleted()
+    {
+        foreach (BottleController bottle in gameBottles)
+        {
+            if (!bottle.CheckIfBottleIsCompleted())
+                return false;
+        }
+        return true;
     }
 }
