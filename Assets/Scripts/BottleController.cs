@@ -12,8 +12,8 @@ public class BottleController : MonoBehaviour
     public AnimationCurve RotationSpeedMultiplier;
 
 
-    private float[] fillAmounts = new float[5] {-0.5f,-0.29f,-0.08f,0.13f,0.34f};
-    private float[] rotationValues = new float[4] {54,71,83,90};
+    private float[] fillAmounts;
+    private float[] rotationValues;
 
     private int rotationIndex = 0;
 
@@ -71,9 +71,14 @@ public class BottleController : MonoBehaviour
 
 
 
-    public void SetBottle()
+    public void SetBottle(Color[] colors, int numOfColors)
     {
-
+        bottleColors = colors;
+        numberOfColorsInBottle = numOfColors;
+        fillAmounts = Constants.fillAmounts;
+        rotationValues = Constants.rotationValues;
+        UpdateColorsOnShader();
+        UpdateTopColorValues();
     }
 
     void OnMouseDown()
